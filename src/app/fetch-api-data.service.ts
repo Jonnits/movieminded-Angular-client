@@ -15,7 +15,6 @@ export class FetchApiDataService {
   }
   // Making the api call for the user registration endpoint
   public userRegistration(userDetails: any): Observable<any> {
-    console.log(userDetails);
     return this.http.post(apiUrl + 'users', userDetails).pipe(
       catchError(this.handleError)
     );
@@ -23,7 +22,6 @@ export class FetchApiDataService {
 
   // User login
   public userLogin(userDetails: any): Observable<any> {
-    console.log(userDetails);
     return this.http.post(apiUrl + 'login', userDetails).pipe(
       map(this.extractResponseData),
       catchError(this.handleError)
@@ -183,15 +181,19 @@ export class FetchApiDataService {
   }
 
 private handleError(error: HttpErrorResponse): any {
+    console.error('HTTP Error:', error);
+    
     if (error.error instanceof ErrorEvent) {
-    console.error('Some error occurred:', error.error.message);
+      // Client-side error
+      console.error('Client-side error:', error.error.message);
+      return throwError(() => new Error('A client-side error occurred. Please check your connection.'));
     } else {
-    console.error(
-        `Error Status code ${error.status}, ` +
-        `Error body is: ${error.error}`);
+      // Server-side error
+      console.error(`Server error - Status: ${error.status}, Body:`, error.error);
+      
+      // Return the actual error object so components can access error details
+      return throwError(() => error);
     }
-    return throwError(
-    'Something bad happened; please try again later.');
   }
 }
 
